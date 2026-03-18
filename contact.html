@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>Contact | CreatorAccess Media</title>
+<link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>.apply-section input,
+.apply-section textarea{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:6px;
+border:1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="navbar">
+<a href="index.html">
+<img src="./image/creatoraccess_media_cover.jpg" class="logo">
+</a>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="vision.html">Vision & Mission</a>
+<a href="creators.html">For Creators</a>
+<a href="brands.html">For Brands</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<section class="apply-section">
+
+<h1>Contact Us</h1>
+
+<form id="contactForm">
+
+<input type="text" name="name" placeholder="Your Name" required>
+<input type="email" name="email" placeholder="Your Email" required>
+
+<textarea name="message" placeholder="Your Message" required></textarea>
+
+<button class="primary-btn">Send Message</button>
+
+</form>
+
+</section>
+
+<script>
+
+const form = document.getElementById("contactForm");
+
+form.addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const formData = {
+name: form.name.value,
+email: form.email.value,
+message: form.message.value
+};
+
+const res = await fetch("http://localhost:5000/contact", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify(formData)
+});
+
+const data = await res.json();
+
+alert(data.message);
+
+form.reset();
+
+});
+
+</script>
+
+<footer>
+<p>© 2026 CreatorAccess Media</p>
+</footer>
+
+</body>
+</html>

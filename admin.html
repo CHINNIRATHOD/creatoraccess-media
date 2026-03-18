@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>Admin Dashboard | CreatorAccess Media</title>
+<link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+.admin-dashboard{
+padding:120px 20px;
+text-align:center;
+background:rgba(255,255,255,0.95);
+}
+
+.admin-cards{
+display:flex;
+justify-content:center;
+gap:30px;
+margin:40px 0;
+flex-wrap:wrap;
+}
+
+.admin-card{
+background:white;
+padding:30px;
+border-radius:10px;
+width:220px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.admin-card h2{
+font-size:18px;
+margin-bottom:10px;
+}
+
+.admin-card p{
+font-size:28px;
+font-weight:bold;
+color:#0b4f6c;
+}
+
+.admin-table{
+width:90%;
+margin:30px auto;
+border-collapse:collapse;
+}
+
+.admin-table th,
+.admin-table td{
+padding:12px;
+border:1px solid #ddd;
+}
+
+.admin-table th{
+background:#0b4f6c;
+color:white;
+}
+</style>
+
+<script>
+// ✅ JWT check
+if(!localStorage.getItem("adminToken")){
+window.location.href = "admin-login.html";
+}
+</script>
+
+</head>
+
+<body>
+
+<button onclick="logout()" class="secondary-btn">Logout</button>
+
+<header>
+<div class="navbar">
+<a href="index.html">
+<img src="./image/creatoraccess_media_cover.jpg" class="logo">
+</a>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="#">Dashboard</a>
+<a href="#">Applications</a>
+<a href="#" onclick="showMessages()">Messages</a>
+</nav>
+</div>
+</header>
+
+<section class="admin-dashboard">
+
+<h1>Admin Dashboard</h1>
+
+<div class="admin-cards">
+
+<div class="admin-card">
+<h2>Total Applications</h2>
+<p id="totalApps">0</p>
+</div>
+
+<div class="admin-card">
+<h2>Pending Approvals</h2>
+<p id="pendingApps">0</p>
+</div>
+
+<div class="admin-card">
+<h2>Messages</h2>
+<p id="totalMessages">0</p>
+</div>
+
+</div>
+
+<h2>Recent Creator Applications</h2>
+
+<button onclick="loadApplications()" class="primary-btn">
+Refresh Data
+</button>
+
+<table class="admin-table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Social</th>
+<th>Category</th>
+<th>Followers</th>
+<th>Message</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</section>
+
+<!-- MESSAGES SECTION -->
+
+<section id="messagesSection" style="display:none;">
+
+<button onclick="location.reload()" class="secondary-btn">
+Back to Dashboard
+</button>
+
+<h2>Messages</h2>
+
+<table class="admin-table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Message</th>
+</tr>
+</thead>
+
+<tbody id="messagesTable"></tbody>
+
+</table>
+
+</section>
+
+<footer>
+<p>© 2026 CreatorAccess Media</p>
+</footer>
+
+<script>
+// ✅ Logout
+function logout(){
+localStorage.removeItem("adminToken");
+window.location.href = "admin-login.html";
+}
+
+// =======================
+// LOAD APPLICATIONS
+// =======================
+async function loadApplications(){
+
+try{
+const res = await fetch("http://localhost:5000/applications", {
+headers: {
+"Authorization": localStorage.getItem("adminToken")
+}
+});
+
+const data = await res.json();
+
+const tableBody = document.getElementById("tableBody");
+tableBody.innerHTML = "";
+
+data.forEach(app => {
+let row = `
+<tr>
+<td>${app.name}</td>
+<td>${app.email}</td>
+<td>${app.social || "-"}</td>
+<td>${app.category}</td>
+<td>${app.followers}</td>
+<td>${app.message}</td>
+<td>${app.status}</td>
+<td>
+<button onclick="updateStatus('${app._id}', 'Approved')" class="primary-btn">Approve</button>
+<button onclick="updateStatus('${app._id}', 'Rejected')" class="secondary-btn">Reject</button>
+</td>
+</tr>
+`;
+tableBody.innerHTML += row;
+});
+
+}catch(err){
+console.log("Error fetching applications:", err);
+}
+}
+
+// =======================
+// LOAD STATS
+// =======================
+async function loadStats(){
+
+try{
+const res = await fetch("http://localhost:5000/applications", {
+headers: {
+"Authorization": localStorage.getItem("adminToken")
+}
+});
+
+const apps = await res.json();
+
+const total = apps.length;
+const pending = apps.filter(a => a.status === "Pending").length;
+
+document.getElementById("totalApps").innerText = total;
+document.getElementById("pendingApps").innerText = pending;
+
+// ✅ Messages count
+const msgRes = await fetch("http://localhost:5000/messages", {
+headers: {
+"Authorization": localStorage.getItem("adminToken")
+}
+});
+
+const messages = await msgRes.json();
+
+document.getElementById("totalMessages").innerText = messages.length;
+
+}catch(err){
+console.log("Stats error:", err);
+}
+}
+
+// =======================
+// UPDATE STATUS
+// =======================
+async function updateStatus(id, status){
+
+await fetch(`http://localhost:5000/update-status/${id}`, {
+method: "PUT",
+headers: {
+"Content-Type": "application/json",
+"Authorization": localStorage.getItem("adminToken")
+},
+body: JSON.stringify({ status })
+});
+
+loadApplications();
+loadStats();
+
+}
+
+// =======================
+// LOAD MESSAGES
+// =======================
+async function loadMessages(){
+
+const res = await fetch("http://localhost:5000/messages", {
+headers: {
+"Authorization": localStorage.getItem("adminToken")
+}
+});
+
+const data = await res.json();
+
+let html = "";
+
+data.forEach(msg => {
+html += `
+<tr>
+<td>${msg.name}</td>
+<td>${msg.email}</td>
+<td>${msg.message}</td>
+</tr>
+`;
+});
+
+document.getElementById("messagesTable").innerHTML = html;
+
+}
+
+// =======================
+// SHOW MESSAGES
+// =======================
+function showMessages(){
+document.querySelector(".admin-dashboard").style.display = "none";
+document.getElementById("messagesSection").style.display = "block";
+loadMessages();
+}
+
+// =======================
+// INIT
+// =======================
+loadApplications();
+loadStats();
+
+</script>
+
+</body>
+</html>

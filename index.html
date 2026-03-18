@@ -1,47 +1,211 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-
 <title>CreatorAccess Media</title>
+<link rel="icon" type="image/x-icon" href="./image/icon.jpg">
 <link rel="stylesheet" href="css/style.css">
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body>
-
 <header>
+<div class="navbar">
 
-<h1>CreatorAccess Media</h1>
+<a href="index.html">
+<img src="./image/creatoraccess_media_cover.jpg" class="logo">
+</a>
 
-<nav>
+<div class="menu-toggle" id="menu-toggle">
+&#9776;
+</div>
 
-<a href="index.html">Home</a> <a href="about.html">About</a> <a href="vision.html">Vision & Mission</a> <a href="creators.html">For Creators</a> <a href="brands.html">For Brands</a> <a href="contact.html">Contact</a>
-
+<nav id="nav-menu">
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="vision.html">Vision & Mission</a>
+<a href="creators.html">For Creators</a>
+<a href="brands.html">For Brands</a>
+<a href="contact.html">Contact</a>
+<a href="admin.html">Admin</a>
 </nav>
 
+</div>
+
+
+
+</div>
 </header>
+
+<!-- HERO -->
 
 <section class="hero">
 
-<h2>Connecting Brands With Trusted Creators</h2>
+<div class="floating-shape shape1"></div>
+<div class="floating-shape shape2"></div>
+<div class="floating-shape shape3"></div>
 
-<p>
-CreatorAccess Media helps brands collaborate with creators who have
-real influence and genuine audience trust.
+<h1 data-aos="fade-up">Connecting Brands With Trusted Creators</h1>
+<p data-aos="fade-up" data-aos-delay="200">
+CreatorAccess Media helps brands collaborate with creators who have real influence and genuine audience trust.
 </p>
 
-<button>Join as Creator</button>
+<div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
+<a href="creator-apply.html">
+<button class="primary-btn">Join as Creator</button>
+</a>
+<a href="brands.html">
+<button class="secondary-btn">Work With Creators</button>
+</a></div>
 
-<button>Work With Creators</button>
 
 </section>
+
+<!-- TRUST LOGOS -->
+<!-- 
+<section class="trust">
+<h2>Trusted by Brands Worldwide</h2>
+<div class="logos" data-aos="fade-up">
+<img src="./image/logo1.png">
+<img src="./image/logo2.png">
+<img src="./image/logo3.png">
+<img src="./image/logo4.png">
+
+</div>
+
+</section> -->
+
+<!-- HOW IT WORKS -->
+
+<section class="how-it-works">
+
+<h2>How CreatorAccess Works</h2>
+
+<div class="steps">
+
+<div class="creator-card" data-aos="zoom-in" data-aos-delay="0">
+    <h3>Creators Join</h3>
+<p>Create your profile and showcase your audience.</p>
+</div>
+
+<div class="creator-card" data-aos="zoom-in" data-aos-delay="200">
+<h3>Brands Discover</h3>
+<p>Brands find creators that match their campaign goals.</p>
+</div>
+
+<div class="creator-card" data-aos="zoom-in" data-aos-delay="400">
+<h3>Collaborate</h3>
+<p>Launch authentic collaborations and grow together.</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- BENEFITS -->
+
+<section class="benefits">
+
+<h2>Benefits for Creators</h2>
+
+<div class="benefit-grid">
+
+<div class="creator-card" data-aos="fade-up" data-aos-delay="0">
+<img src="./image/avatar1.png" class="avatar">
+<h3>Brand Partnerships</h3>
+<p>Work with brands looking for authentic creators.</p>
+</div>
+
+<div class="creator-card" data-aos="fade-up" data-aos-delay="200">
+<img src="./image/avatar2.png" class="avatar">
+<h3>Grow Influence</h3>
+<p>Build long-term partnerships with top brands.</p>
+</div>
+
+<div class="creator-card" data-aos="fade-up" data-aos-delay="400">
+<img src="./image/avatar3.png" class="avatar">
+<h3>Earn Revenue</h3>
+<p>Monetize your audience through real campaigns.</p>
+</div>
+
+</div>
+
+</section>
+<!-- FEATURED CREATORS -->
+
+<section class="featured-creators">
+
+<h2>Featured Creators</h2>
+
+<div class="creator-grid">
+
+<a href="creator-rahul.html" class="creator-link">
+<div class="creator-card" data-aos="flip-left" data-aos-delay="0">
+<img src="./image/avatar1.png" class="avatar">
+<h3>Rahul Sharma</h3>
+<p>Fitness Creator</p>
+<p>120K Followers</p>
+</div>
+</a>
+<a href="creator-anita.html" class="creator-link">
+<div class="creator-card" data-aos="flip-left" data-aos-delay="200">
+<img src="./image/avatar2.png" class="avatar">
+<h3>Anita Verma</h3>
+<p>Tech Reviewer</p>
+<p>85K Followers</p>
+</div>
+</a>
+
+<a href="creator-arjun.html" class="creator-link">
+<div class="creator-card" data-aos="flip-left" data-aos-delay="400">
+<img src="./image/avatar3.png" class="avatar">
+<h3>Arjun Patel</h3>
+<p>Travel Vlogger</p>
+<p>210K Followers</p>
+</div>
+</a>
+
+</div>
+
+</section>
+<!-- CTA -->
+
+<section class="cta">
+
+<h2>Ready to Collaborate?</h2>
+
+<p>Join CreatorAccess Media and start building powerful partnerships.</p>
+
+<a href="creator-apply.html" class="primary-btn">Get Started</a>
+</section>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+
+<script>
+AOS.init({
+duration: 1000,
+once: true
+});
+</script>
+
 
 <footer>
 
 <p>© 2026 CreatorAccess Media</p>
 
 </footer>
+<script>
+
+const menuToggle = document.getElementById("menu-toggle");
+const navMenu = document.getElementById("nav-menu");
+
+menuToggle.addEventListener("click", () => {
+navMenu.classList.toggle("active");
+});
+
+</script>
 
 </body>
 </html>

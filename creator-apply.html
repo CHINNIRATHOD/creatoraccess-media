@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>Apply as Creator | CreatorAccess Media</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="navbar">
+
+<a href="index.html">
+<img src="./image/creatoraccess_media_cover.jpg" class="logo">
+</a>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="vision.html">Vision & Mission</a>
+<a href="creators.html">For Creators</a>
+<a href="brands.html">For Brands</a>
+<a href="contact.html">Contact</a>
+</nav>
+
+</div>
+
+</header>
+
+<section class="apply-section">
+
+<h1>Apply as a Creator</h1>
+
+<p>Join CreatorAccess Media and collaborate with brands.</p>
+
+<form class="creator-form" id="creatorForm">
+
+<input type="text" name="name" placeholder="Full Name" required>
+
+<input type="email" name="email" placeholder="Email Address" required>
+
+<input type="text" name="social" placeholder="Social Media Profile Link">
+
+<input type="number" name="followers" placeholder="Follower Count">
+
+
+
+<select name="category" required>
+<option value="">Select Category</option>
+<option>Fitness</option>
+<option>Tech</option>
+<option>Travel</option>
+<option>Lifestyle</option>
+<option>Gaming</option>
+<option>Food</option>
+<option>Cosmetic</option>
+</select>
+
+<textarea name="message" placeholder="Tell us about your content"></textarea>
+
+<button class="primary-btn">Submit Application</button>
+
+</form>
+
+
+<p id="formMessage" style="display:none; color:green; font-weight:bold; margin-top:20px;">
+Application Submitted Successfully! We will contact you soon.
+</p>
+
+
+</section>
+
+<footer>
+<p>© 2026 CreatorAccess Media</p>
+</footer>
+
+<script>
+
+const form = document.getElementById("creatorForm");
+
+form.addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const formData = {
+name: form.name.value,
+email: form.email.value,
+social: form.social.value,
+followers: form.followers.value,
+category: form.category.value,
+message: form.message.value
+};
+
+
+const res = await fetch("http://localhost:5000/apply", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify(formData)
+});
+
+const data = await res.json();
+
+document.getElementById("formMessage").style.display = "block";
+
+form.reset();
+
+});
+
+</script>
+
+
+
+</body>
+
+</html>
