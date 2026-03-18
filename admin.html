@@ -178,10 +178,9 @@ window.location.href = "admin-login.html";
 async function loadApplications(){
 
 try{
-const res = await fetch("http://localhost:5000/applications", {
+const res = await fetch("https://name-creatoraccess-backend.onrender.com/applications", {
 headers: {
-"Authorization": localStorage.getItem("adminToken")
-}
+"Authorization": "Bearer " + localStorage.getItem("adminToken")}
 });
 
 const data = await res.json();
@@ -219,7 +218,7 @@ console.log("Error fetching applications:", err);
 async function loadStats(){
 
 try{
-const res = await fetch("http://localhost:5000/applications", {
+const res = await fetch("https://name-creatoraccess-backend.onrender.com/applications", {
 headers: {
 "Authorization": localStorage.getItem("adminToken")
 }
@@ -234,10 +233,9 @@ document.getElementById("totalApps").innerText = total;
 document.getElementById("pendingApps").innerText = pending;
 
 // ✅ Messages count
-const msgRes = await fetch("http://localhost:5000/messages", {
+const msgRes = await fetch("https://name-creatoraccess-backend.onrender.com/messages", {
 headers: {
-"Authorization": localStorage.getItem("adminToken")
-}
+"Authorization": "Bearer " + localStorage.getItem("adminToken")}
 });
 
 const messages = await msgRes.json();
@@ -254,12 +252,11 @@ console.log("Stats error:", err);
 // =======================
 async function updateStatus(id, status){
 
-await fetch(`http://localhost:5000/update-status/${id}`, {
+await fetch(`https://name-creatoraccess-backend.onrender.com/update-status/${id}`, {
 method: "PUT",
 headers: {
 "Content-Type": "application/json",
-"Authorization": localStorage.getItem("adminToken")
-},
+"Authorization": "Bearer " + localStorage.getItem("adminToken")},
 body: JSON.stringify({ status })
 });
 
@@ -273,9 +270,9 @@ loadStats();
 // =======================
 async function loadMessages(){
 
-const res = await fetch("http://localhost:5000/messages", {
+const res = await fetch("https://name-creatoraccess-backend.onrender.com/messages", {
 headers: {
-"Authorization": localStorage.getItem("adminToken")
+"Authorization": "Bearer " + localStorage.getItem("adminToken")
 }
 });
 

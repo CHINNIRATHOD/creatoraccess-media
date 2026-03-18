@@ -34,8 +34,7 @@ res.json({ success: false });
 
 function verifyToken(req, res, next){
 
-const token = req.headers.authorization;
-
+const token = req.headers.authorization?.split(" ")[1];
 if(!token){
 return res.status(403).json({ error: "No token provided" });
 }
@@ -103,8 +102,7 @@ res.status(500).json({ error: "Failed to send message" });
 
 });
 
-app.get("/messages", async (req, res) => {
-
+app.get("/messages", verifyToken, async (req, res) => {
 try{
 const data = await Message.find().sort({ date: -1 });
 res.json(data);
