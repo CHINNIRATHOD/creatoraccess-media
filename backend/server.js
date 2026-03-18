@@ -8,8 +8,13 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+const corsOptions = {
+origin: "*", // allow all (for now)
+methods: ["GET", "POST", "PUT", "DELETE"],
+allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));app.use(express.json());
 
 app.post("/admin-login", (req, res) => {
 

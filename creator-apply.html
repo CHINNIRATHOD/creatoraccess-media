@@ -81,12 +81,10 @@ Application Submitted Successfully! We will contact you soon.
 <p>© 2026 CreatorAccess Media</p>
 </footer>
 
-<script>
-
+<<script>
 const form = document.getElementById("creatorForm");
 
 form.addEventListener("submit", async function(e){
-
 e.preventDefault();
 
 const formData = {
@@ -98,8 +96,9 @@ category: form.category.value,
 message: form.message.value
 };
 
+try{
 
-const res = await fetch("https://name-creatoraccess-backend.onrender.com/apply", {
+const res = await fetch("https://creatoraccess-media.onrender.com/apply", {
 method: "POST",
 headers: {
 "Content-Type": "application/json"
@@ -109,14 +108,16 @@ body: JSON.stringify(formData)
 
 const data = await res.json();
 
-document.getElementById("formMessage").style.display = "block";
+alert(data.message || "Application submitted successfully ✅");
 
 form.reset();
 
+}catch(err){
+alert("Error submitting form ❌");
+console.log(err);
+}
 });
-
 </script>
-
 
 
 </body>
