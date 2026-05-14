@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: creatoraccess-media-api
+    name: creatoraccess-media
     env: node
     rootDir: backend
     buildCommand: npm install
