@@ -1,5 +1,6 @@
 const searchInput = document.getElementById("searchInput");
 
+if(searchInput){
 searchInput.addEventListener("keyup", function(){
 
 let filter = searchInput.value.toLowerCase();
@@ -16,8 +17,8 @@ card.parentElement.style.display = "none";
 }
 
 });
-
 });
+}
 
 function filterCreators(category){
 

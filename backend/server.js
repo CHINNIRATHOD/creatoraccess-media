@@ -1,184 +1,176 @@
-const jwt = require("jsonwebtoken");
-
-const SECRET_KEY = "mysecretkey"; // change later
-
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET || "change-this-secret-before-deploying";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gmail.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "123456";
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "*")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
 
-const corsOptions = {
-origin: "*", // allow all (for now)
-methods: ["GET", "POST", "PUT", "DELETE"],
-allowedHeaders: ["Content-Type", "Authorization"]
-};
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.includes("*") || ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.use(express.json());
 
-app.use(cors(corsOptions));app.use(express.json());
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
 
-app.post("/admin-login", (req, res) => {
+  if (!token) {
+    return res.status(403).json({ error: "No token provided" });
+  }
 
-const { email, password } = req.body;
-
-if(email === "admin@gmail.com" && password === "123456"){
-
-const token = jwt.sign(
-{ email: email },
-SECRET_KEY,
-{ expiresIn: "1h" }
-);
-
-res.json({ success: true, token });
-
-}else{
-res.json({ success: false });
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    return next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
 }
 
-});
+function requireDatabase(req, res, next) {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({ error: "Database is not connected" });
+  }
 
-
-function verifyToken(req, res, next){
-
-const token = req.headers.authorization?.split(" ")[1];
-if(!token){
-return res.status(403).json({ error: "No token provided" });
+  return next();
 }
-
-try{
-const decoded = jwt.verify(token, SECRET_KEY);
-req.user = decoded;
-next();
-}catch(err){
-return res.status(401).json({ error: "Invalid token" });
-}
-
-}
-
-/* ========================= */
-/* DATABASE CONNECTION */
-/* ========================= */
-
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
-
-/* ========================= */
-/* SCHEMA (ADD HERE ✅) */
-/* ========================= */
 
 const applicationSchema = new mongoose.Schema({
-name: String,
-email: String,
-social: String,
-followers: Number,
-category: String,
-message: String,
-status: {
-type: String,
-default: "Pending"
-}
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true, lowercase: true },
+  social: { type: String, trim: true },
+  followers: { type: Number, default: 0 },
+  category: { type: String, required: true, trim: true },
+  message: { type: String, trim: true },
+  status: {
+    type: String,
+    enum: ["Pending", "Approved", "Rejected"],
+    default: "Pending"
+  }
+}, { timestamps: true });
+
+const messageSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true, lowercase: true },
+  message: { type: String, required: true, trim: true },
+  date: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const Application = mongoose.model("Application", applicationSchema);
-
-const messageSchema = new mongoose.Schema({
-name: String,
-email: String,
-message: String,
-date: {
-type: Date,
-default: Date.now
-}
-});
-
 const Message = mongoose.model("Message", messageSchema);
 
-app.post("/contact", async (req, res) => {
-
-try{
-const newMessage = new Message(req.body);
-await newMessage.save();
-
-res.json({ message: "Message sent successfully" });
-}
-catch(err){
-res.status(500).json({ error: "Failed to send message" });
-}
-
-});
-
-app.get("/messages", verifyToken, async (req, res) => {
-try{
-const data = await Message.find().sort({ date: -1 });
-res.json(data);
-}
-catch(err){
-res.status(500).json({ error: "Failed to fetch messages" });
-}
-
-});
-
-/* ========================= */
-/* ROUTES */
-/* ========================= */
-
 app.get("/", (req, res) => {
-res.send("CreatorAccess Backend Running");
+  res.json({ message: "CreatorAccess backend running" });
 });
 
-app.post("/apply", async (req, res) => {
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+  });
+});
 
-try{
-const newApp = new Application(req.body);
-await newApp.save();
+app.post("/admin-login", (req, res) => {
+  const { email, password } = req.body;
 
-res.json({ message: "Application saved to database" });
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+    return res.json({ success: true, token });
+  }
+
+  return res.status(401).json({ success: false, error: "Invalid credentials" });
+});
+
+app.post("/contact", requireDatabase, async (req, res) => {
+  try {
+    const newMessage = new Message(req.body);
+    await newMessage.save();
+    return res.status(201).json({ message: "Message sent successfully" });
+  } catch (err) {
+    return res.status(400).json({ error: "Failed to send message" });
+  }
+});
+
+app.get("/messages", verifyToken, requireDatabase, async (req, res) => {
+  try {
+    const data = await Message.find().sort({ date: -1 });
+    return res.json(data);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
+app.post("/apply", requireDatabase, async (req, res) => {
+  try {
+    const newApplication = new Application(req.body);
+    await newApplication.save();
+    return res.status(201).json({ message: "Application submitted successfully" });
+  } catch (err) {
+    return res.status(400).json({ error: "Failed to save application" });
+  }
+});
+
+app.get("/applications", verifyToken, requireDatabase, async (req, res) => {
+  try {
+    const data = await Application.find().sort({ createdAt: -1 });
+    return res.json(data);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch applications" });
+  }
+});
+
+app.get("/stats", verifyToken, requireDatabase, async (req, res) => {
+  try {
+    const totalApplications = await Application.countDocuments();
+    const pendingApplications = await Application.countDocuments({ status: "Pending" });
+    const totalMessages = await Message.countDocuments();
+
+    return res.json({ totalApplications, pendingApplications, totalMessages });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+app.put("/update-status/:id", verifyToken, requireDatabase, async (req, res) => {
+  const { status } = req.body;
+
+  if (!["Pending", "Approved", "Rejected"].includes(status)) {
+    return res.status(400).json({ error: "Invalid status" });
+  }
+
+  try {
+    await Application.findByIdAndUpdate(req.params.id, { status }, { runValidators: true });
+    return res.json({ message: "Status updated successfully" });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to update status" });
+  }
+});
+
+if (MONGO_URI) {
+  mongoose.connect(MONGO_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.error("MongoDB connection failed:", err.message));
+} else {
+  console.warn("MONGO_URI is not set. Database routes will return 503.");
 }
-catch(err){
-res.status(500).json({ error: "Failed to save data" });
-}
 
-});
-
-app.get("/applications", verifyToken, async (req, res) => {
-    const data = await Application.find();
-res.json(data);
-});
-
-
-app.get("/stats", async (req, res) => {
-
-const total = await Application.countDocuments();
-
-res.json({
-totalApplications: total
-});
-
-});
-
-app.put("/update-status/:id", async (req, res) => {
-
-const { status } = req.body;
-
-try{
-
-await Application.findByIdAndUpdate(req.params.id, { status });
-
-res.json({ message: "Status updated successfully" });
-
-}
-catch(err){
-res.status(500).json({ error: "Failed to update status" });
-}
-
-});
-
-
-
-/* ========================= */
-/* SERVER */
-/* ========================= */
-
-app.listen(5000, () => {
-console.log("Server running on http://localhost:5000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

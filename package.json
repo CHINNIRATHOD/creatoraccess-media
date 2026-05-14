@@ -1,4 +1,11 @@
 {
+  "name": "creatoraccess-media",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cd backend && npm start",
+    "test": "npm --prefix backend test"
+  },
   "dependencies": {
     "jsonwebtoken": "^9.0.3"
   }
